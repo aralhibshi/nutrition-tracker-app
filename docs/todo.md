@@ -2,6 +2,33 @@
 
 Work deferred until its dependencies exist. Remove items as they're done.
 
+## Milestones
+
+Each milestone ends with a minor version bump (`npm version minor`); 1.0.0 is
+the store release.
+
+### 0.1.0: Offline foundations
+
+- [ ] CI with GitHub Actions: format check, lint, type-check and Jest on every
+      push.
+- [ ] API repo set up with its own CI.
+- [ ] Local database with migrations (op-sqlite and Drizzle).
+- [ ] Food search from the bundled database (USDA FoodData Central, FTS5
+      index).
+- [ ] Food and water logging.
+- [ ] Today view: calories, macros and water against targets.
+
+### Later milestones
+
+- **0.2.0: Sync.** Accounts, the push and pull API, both halves of the sync
+  engine, sign-in and account deletion.
+- **0.3.0: Fasting.** Prayer times, the eating window, Ramadan mode, reminders
+  and feature flags.
+- **0.4.0: Health and language.** Apple Health and Health Connect, and full
+  Arabic. The i18n and RTL groundwork is already in place.
+- **1.0.0: Store release.** Release pipeline, monitoring, end-to-end flows,
+  curated regional foods, TestFlight and a Play internal test.
+
 ## i18n
 
 - [ ] **Persist the manual language choice.** `setupI18n(chosenLanguage)` and
