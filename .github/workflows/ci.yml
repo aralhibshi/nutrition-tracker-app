@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Git hooks are for local commits; skip installing them in CI.
+  HUSKY: 0
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
