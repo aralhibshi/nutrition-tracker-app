@@ -1,7 +1,12 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
+import RNRestart from 'react-native-restart';
 
-import { i18n, setupI18n } from '../../../src/i18n';
+import { changeLanguage, i18n, setupI18n } from '../../../src/i18n';
 import LanguageTestScreen from '../../../src/screens/languageTest/LanguageTestScreen';
+import {
+  readLanguageChoice,
+  saveLanguageChoice,
+} from '../../../src/storage/preferences';
 
 describe('LanguageTestScreen', () => {
   beforeAll(() => {
@@ -49,5 +54,40 @@ describe('LanguageTestScreen', () => {
     expect(
       screen.getByRole('button', { name: 'Remove a glass' }),
     ).toBeDisabled();
+  });
+
+  describe('language switch', () => {
+    beforeEach(async () => {
+      await changeLanguage('en', saveLanguageChoice);
+      jest.mocked(RNRestart.restart).mockClear();
+    });
+
+    test('switches to Arabic, saves it and restarts for RTL', async () => {
+      const user = userEvent.setup();
+      await render(<LanguageTestScreen />);
+
+      await user.press(screen.getByRole('button', { name: 'العربية' }));
+
+      expect(
+        screen.getByRole('header', { name: 'اختبار اللغة' }),
+      ).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'العربية' })).toBeSelected();
+      expect(readLanguageChoice()).toBe('ar');
+      expect(RNRestart.restart).toHaveBeenCalledTimes(1);
+    });
+
+    test('Device clears the choice and follows the device language', async () => {
+      const user = userEvent.setup();
+      await changeLanguage('ar', saveLanguageChoice);
+      await render(<LanguageTestScreen />);
+
+      await user.press(screen.getByRole('button', { name: 'الجهاز' }));
+
+      expect(
+        screen.getByRole('header', { name: 'Language test' }),
+      ).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: 'Device' })).toBeSelected();
+      expect(readLanguageChoice()).toBeNull();
+    });
   });
 });

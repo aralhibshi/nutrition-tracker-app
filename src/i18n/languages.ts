@@ -6,6 +6,12 @@ export type Language = (typeof languages)[number];
 
 export const defaultLanguage: Language = 'en';
 
+/** Each language's name in that language, as shown in a language picker. */
+export const languageNames: Readonly<Record<Language, string>> = {
+  en: 'English',
+  ar: 'العربية',
+};
+
 const rtlLanguages: ReadonlySet<Language> = new Set(['ar']);
 
 /**
@@ -13,9 +19,9 @@ const rtlLanguages: ReadonlySet<Language> = new Set(['ar']);
  * digits. Set explicitly because engines differ: Hermes formats Arabic with
  * 0-9 by default, Node with Eastern Arabic digits.
  */
-export type NumberingSystem = 'latn' | 'arab';
+type NumberingSystem = 'latn' | 'arab';
 
-export const numberingSystem: NumberingSystem = 'latn';
+const numberingSystem: NumberingSystem = 'latn';
 
 /** The locale tag to pass to Intl, with the numbering system applied. */
 export function intlLocale(language: Language): string {

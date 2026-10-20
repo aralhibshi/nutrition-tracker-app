@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@formatjs/intl-pluralrules": "6.3.16",
-    "@react-native/new-app-screen": "0.88.0",
     "i18next": "26.5.3",
     "i18next-icu": "2.6.1",
     "intl-messageformat": "12.1.4",
@@ -19,13 +18,14 @@
     "react-i18next": "17.1.0",
     "react-native": "0.88.0",
     "react-native-localize": "3.7.2",
+    "react-native-mmkv": "4.3.2",
+    "react-native-nitro-modules": "0.37.1",
     "react-native-restart": "0.0.29",
     "react-native-safe-area-context": "5.10.1"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",
     "@babel/plugin-transform-class-static-block": "7.29.7",
-    "@babel/preset-env": "7.29.7",
     "@babel/runtime": "7.29.10",
     "@react-native-community/cli": "20.2.0",
     "@react-native-community/cli-platform-android": "20.2.0",

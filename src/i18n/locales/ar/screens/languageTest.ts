@@ -5,7 +5,6 @@ const languageTest = {
   title: 'اختبار اللغة',
   intro: 'يتحقق من الترجمة وصيغ الجمع وتنسيق الأرقام والتواريخ واتجاه التخطيط.',
   language: 'اللغة: {name}',
-  languageName: 'العربية',
   direction: 'اتجاه التخطيط: {direction}',
   ltr: 'من اليسار إلى اليمين',
   rtl: 'من اليمين إلى اليسار',
@@ -20,8 +19,10 @@ const languageTest = {
   layoutTitle: 'التخطيط',
   start: 'البداية',
   end: 'النهاية',
-  changeLanguage: 'تغيير اللغة',
-  changeLanguageHint: 'يفتح إعداد اللغة لهذا التطبيق.',
+  choiceTitle: 'لغة التطبيق',
+  deviceOption: 'الجهاز',
+  choiceHint:
+    'التبديل بين العربية والإنجليزية يعيد تشغيل التطبيق لتغيير اتجاه التخطيط.',
 } satisfies Translations['screens']['languageTest'];
 
 export default languageTest;

@@ -12,16 +12,23 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { openLanguageSettings } from '../../i18n';
+import { changeLanguage, languageChoice } from '../../i18n';
 import { formatDate, formatNumber } from '../../i18n/format';
 import {
   defaultLanguage,
   isLanguage,
+  languageNames,
   type Language,
 } from '../../i18n/languages';
+import { saveLanguageChoice } from '../../storage/preferences';
 
 // Covers every Arabic plural form: zero, one, two, few, many and other.
 const counts: readonly number[] = [0, 1, 2, 3, 11, 100];
+
+type LanguageOption = {
+  readonly choice: Language | null;
+  readonly label: string;
+};
 
 function LanguageTestScreen(): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -30,6 +37,20 @@ function LanguageTestScreen(): React.JSX.Element {
     ? i18n.language
     : defaultLanguage;
   const count: number = counts[countIndex] ?? 0;
+  const [choice, setChoice] = useState<Language | null>(languageChoice());
+
+  const options: readonly LanguageOption[] = [
+    { choice: null, label: t('screens.languageTest.deviceOption') },
+    { choice: 'en', label: languageNames.en },
+    { choice: 'ar', label: languageNames.ar },
+  ];
+
+  const selectLanguage = (next: Language | null): void => {
+    setChoice(next);
+    changeLanguage(next, saveLanguageChoice).catch(() => {
+      setChoice(languageChoice());
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -40,9 +61,41 @@ function LanguageTestScreen(): React.JSX.Element {
         <Text style={styles.body}>{t('screens.languageTest.intro')}</Text>
 
         <View style={styles.card}>
+          <Text style={styles.heading}>
+            {t('screens.languageTest.choiceTitle')}
+          </Text>
+          <View style={styles.segments}>
+            {options.map(option => {
+              const selected: boolean = option.choice === choice;
+              return (
+                <Pressable
+                  key={option.choice ?? 'device'}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  onPress={() => selectLanguage(option.choice)}
+                  style={[styles.segment, selected && styles.segmentSelected]}
+                >
+                  <Text
+                    style={[
+                      styles.segmentText,
+                      selected && styles.segmentTextSelected,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Text style={styles.hint}>
+            {t('screens.languageTest.choiceHint')}
+          </Text>
+        </View>
+
+        <View style={styles.card}>
           <Text style={styles.body}>
             {t('screens.languageTest.language', {
-              name: t('screens.languageTest.languageName'),
+              name: languageNames[language],
             })}
           </Text>
           <Text style={styles.body}>
@@ -113,22 +166,6 @@ function LanguageTestScreen(): React.JSX.Element {
             <Text style={styles.tag}>{t('screens.languageTest.end')}</Text>
           </View>
         </View>
-
-        <Pressable
-          accessibilityRole="button"
-          accessibilityHint={t('screens.languageTest.changeLanguageHint')}
-          onPress={() => {
-            openLanguageSettings();
-          }}
-          style={styles.primaryButton}
-        >
-          <Text style={styles.primaryButtonText}>
-            {t('screens.languageTest.changeLanguage')}
-          </Text>
-        </Pressable>
-        <Text style={styles.hint}>
-          {t('screens.languageTest.changeLanguageHint')}
-        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -165,8 +202,9 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 13,
+    lineHeight: 18,
     color: '#56635E',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -205,18 +243,30 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '600',
   },
-  primaryButton: {
-    minHeight: 52,
+  segments: {
+    flexDirection: 'row',
+    gap: 4,
+    padding: 4,
     borderRadius: 14,
-    backgroundColor: '#15211D',
+    backgroundColor: '#E4E9E7',
+  },
+  segment: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
   },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+  segmentSelected: {
+    backgroundColor: '#15211D',
+  },
+  segmentText: {
+    fontSize: 15,
     fontWeight: '600',
+    color: '#15211D',
+  },
+  segmentTextSelected: {
+    color: '#FFFFFF',
   },
 });
 

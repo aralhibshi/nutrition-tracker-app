@@ -5,9 +5,8 @@ module.exports = {
   testMatch: ['<rootDir>/test/unit/**/*.test.[jt]s?(x)'],
   // Keep the preset's setup and add the native module mocks.
   setupFiles: [...preset.setupFiles, '<rootDir>/test/setup.ts'],
-  // The preset's pattern, plus intl-messageformat and its @formatjs
-  // dependencies, which only ship ES modules.
+  // The preset's pattern, plus packages that only ship ES modules.
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|intl-messageformat|@formatjs)/)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|react-native-mmkv|react-native-nitro-modules|intl-messageformat|@formatjs)/)',
   ],
 };

@@ -31,14 +31,9 @@ the store release.
 
 ## i18n
 
-- [ ] **Persist the manual language choice.** `setupI18n(chosenLanguage)` and
-      `changeLanguage(language, persist)` are ready; wire them to the settings
-      table once the local database exists. Until then the app follows the device
-      language.
-- [ ] **Decide on the in-app language picker.** The test screen opens the
-      system's per-app language setting (iOS Settings › app › Language,
-      Android 13+ App language), which needs no storage. An instant in-app
-      switch needs the stored choice above.
+- [ ] **Move the language switch into the real settings screen** (Device /
+      English / العربية) once it exists. The choice is saved with MMKV
+      (`src/storage/preferences.ts`) and read at startup.
 - [ ] **Confirm the digits decision.** `numberingSystem` in
       `src/i18n/languages.ts` is `'latn'` (0–9); switch to `'arab'` for Eastern
       Arabic digits.
@@ -58,6 +53,12 @@ the store release.
 - [ ] Turn on `noUncheckedIndexedAccess` in `tsconfig.json`.
 - [ ] Remove the `ft-flow` rule overrides in `eslint.config.js` once
       `@react-native/eslint-config` ships `eslint-plugin-ft-flow` 3.x.
+- [ ] Move to ESLint 10 once `@react-native/eslint-config` supports it (0.88
+      allows `^8 || ^9`; ESLint 9 is maintenance-only).
+- [ ] Recheck `npm audit` when patched versions of `braces` and `sprintf-js`
+      are published. Both are build- and test-tool dependencies only, not in
+      the app bundle. Don't run `npm audit fix --force`: it downgrades React
+      Native to 0.72.
 
 ## Product scope
 

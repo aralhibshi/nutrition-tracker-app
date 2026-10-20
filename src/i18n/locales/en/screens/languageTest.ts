@@ -4,7 +4,6 @@ const languageTest = {
   intro:
     'Checks translations, plurals, number and date formatting, and the layout direction.',
   language: 'Language: {name}',
-  languageName: 'English',
   direction: 'Layout direction: {direction}',
   ltr: 'left to right',
   rtl: 'right to left',
@@ -19,8 +18,10 @@ const languageTest = {
   layoutTitle: 'Layout',
   start: 'Start',
   end: 'End',
-  changeLanguage: 'Change language',
-  changeLanguageHint: 'Opens the language setting for this app.',
+  choiceTitle: 'App language',
+  deviceOption: 'Device',
+  choiceHint:
+    'Switching between English and Arabic restarts the app to change the layout direction.',
 } as const;
 
 export default languageTest;

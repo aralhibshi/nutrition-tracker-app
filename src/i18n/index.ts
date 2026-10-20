@@ -3,17 +3,8 @@ import './polyfills';
 import i18n from 'i18next';
 import ICU from 'i18next-icu';
 import { initReactI18next } from 'react-i18next';
-import {
-  AppState,
-  I18nManager,
-  Linking,
-  Platform,
-  type EventSubscription,
-} from 'react-native';
-import {
-  findBestLanguageTag,
-  openAppLanguageSettings,
-} from 'react-native-localize';
+import { AppState, I18nManager, type EventSubscription } from 'react-native';
+import { findBestLanguageTag } from 'react-native-localize';
 import RNRestart from 'react-native-restart';
 
 import {
@@ -24,7 +15,7 @@ import {
   resolveLanguage,
   type Language,
 } from './languages';
-import { syncLayoutDirection } from './layoutDirection';
+import { syncLayoutDirection, type DirectionManager } from './layoutDirection';
 import ar from './locales/ar';
 import en from './locales/en';
 
@@ -32,6 +23,24 @@ const directionRestartReason: string = 'layout-direction';
 
 const restartForDirection = (): void =>
   RNRestart.restart(directionRestartReason);
+
+// I18nManager.isRTL only changes after a restart, so a direction requested
+// earlier in this session (with its restart still pending) would otherwise
+// look unchanged. Compare against the requested direction instead.
+let requestedRTL: boolean | null = null;
+
+const directionManager: DirectionManager = {
+  get isRTL(): boolean {
+    return requestedRTL ?? I18nManager.isRTL;
+  },
+  allowRTL(allow: boolean): void {
+    I18nManager.allowRTL(allow);
+  },
+  forceRTL(force: boolean): void {
+    requestedRTL = force;
+    I18nManager.forceRTL(force);
+  },
+};
 
 // Numbers inside ICU messages (such as `#` in plurals) use the app's
 // numbering system too.
@@ -64,7 +73,12 @@ function followLanguageChanges(): void {
     i18n
       .changeLanguage(language)
       .then(() =>
-        syncLayoutDirection(language, I18nManager, restartForDirection, false),
+        syncLayoutDirection(
+          language,
+          directionManager,
+          restartForDirection,
+          false,
+        ),
       );
   });
 }
@@ -93,18 +107,25 @@ export function setupI18n(chosenLanguage: Language | null = null): Language {
       i18nFormat: { parseLngForICU },
     });
 
+  // Resolve the language again when the check runs: the user may already
+  // have switched it, and a stale value would set the wrong direction.
   RNRestart.getReason()
     .then(reason =>
       syncLayoutDirection(
-        language,
-        I18nManager,
+        currentLanguage(),
+        directionManager,
         restartForDirection,
         reason === directionRestartReason,
       ),
     )
     .catch(() => {
       // Without the restart reason, assume a normal launch.
-      syncLayoutDirection(language, I18nManager, restartForDirection, false);
+      syncLayoutDirection(
+        currentLanguage(),
+        directionManager,
+        restartForDirection,
+        false,
+      );
     });
 
   followLanguageChanges();
@@ -112,35 +133,25 @@ export function setupI18n(chosenLanguage: Language | null = null): Language {
   return language;
 }
 
-/**
- * Switches language. `persist` saves the choice before a possible restart,
- * so the app comes back in the chosen language.
- */
-export async function changeLanguage(
-  language: Language,
-  persist: (language: Language) => Promise<void>,
-): Promise<void> {
-  await persist(language);
-  chosen = language;
-  await i18n.changeLanguage(language);
-  syncLayoutDirection(language, I18nManager, restartForDirection, false);
+/** The user's manual choice; null follows the device language. */
+export function languageChoice(): Language | null {
+  return chosen;
 }
 
 /**
- * Opens the system's language setting for this app: the per-app language
- * screen on Android 13+, otherwise the app's page in Settings (on iOS it
- * includes Language, because the app declares more than one).
+ * Switches language. `choice` is a language, or null to follow the device.
+ * `persist` saves the choice before a possible restart, so the app comes
+ * back in the chosen language.
  */
-export async function openLanguageSettings(): Promise<void> {
-  if (Platform.OS === 'android') {
-    try {
-      await openAppLanguageSettings();
-      return;
-    } catch {
-      // Older Android versions have no per-app language screen.
-    }
-  }
-  await Linking.openSettings();
+export async function changeLanguage(
+  choice: Language | null,
+  persist: (choice: Language | null) => void | Promise<void>,
+): Promise<void> {
+  await persist(choice);
+  chosen = choice;
+  const language: Language = currentLanguage();
+  await i18n.changeLanguage(language);
+  syncLayoutDirection(language, directionManager, restartForDirection, false);
 }
 
 export { i18n };

@@ -1,6 +1,11 @@
 import IntlMessageFormat from 'intl-messageformat';
 
-import { changeLanguage, i18n, setupI18n } from '../../../src/i18n';
+import {
+  changeLanguage,
+  i18n,
+  languageChoice,
+  setupI18n,
+} from '../../../src/i18n';
 import ar from '../../../src/i18n/locales/ar';
 import en from '../../../src/i18n/locales/en';
 
@@ -37,11 +42,23 @@ describe('i18n', () => {
   });
 
   test('changeLanguage saves the choice before switching', async () => {
-    const persist = jest.fn(() => Promise.resolve());
+    const persist = jest.fn();
 
     await changeLanguage('ar', persist);
 
     expect(persist).toHaveBeenCalledWith('ar');
     expect(i18n.language).toBe('ar');
+    expect(languageChoice()).toBe('ar');
+  });
+
+  test('changeLanguage with null follows the device language', async () => {
+    const persist = jest.fn();
+    await changeLanguage('ar', persist);
+
+    await changeLanguage(null, persist);
+
+    expect(persist).toHaveBeenLastCalledWith(null);
+    expect(i18n.language).toBe('en');
+    expect(languageChoice()).toBeNull();
   });
 });
