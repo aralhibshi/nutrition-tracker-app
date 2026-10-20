@@ -9,7 +9,7 @@ function flushPromises(): Promise<void> {
 
 describe('setupI18n', () => {
   test('the startup direction check uses the language current when it runs', async () => {
-    let finishReason: (reason: string | null) => void = () => {};
+    let finishReason: ((reason: string | null) => void) | undefined;
     jest.mocked(RNRestart.getReason).mockReturnValueOnce(
       new Promise(resolve => {
         finishReason = resolve;
@@ -21,7 +21,7 @@ describe('setupI18n', () => {
     setupI18n('ar');
     // The user switches to English before the startup check finishes.
     await changeLanguage('en', jest.fn());
-    finishReason(null);
+    finishReason?.(null);
     await flushPromises();
 
     // English matches the LTR layout, so nothing should restart.

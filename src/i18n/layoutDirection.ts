@@ -1,10 +1,10 @@
 import { isRtl, type Language } from './languages';
 
-export type DirectionManager = {
+export interface DirectionManager {
   readonly isRTL: boolean;
   allowRTL(allow: boolean): void;
   forceRTL(force: boolean): void;
-};
+}
 
 export type SyncResult = 'unchanged' | 'restarting' | 'skipped';
 

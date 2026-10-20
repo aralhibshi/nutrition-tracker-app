@@ -1,5 +1,18 @@
 {
   "extends": "@react-native/typescript-config",
+  "compilerOptions": {
+    // Stricter than `strict`: index access may be undefined, optional
+    // properties can't be set to undefined explicitly, and every code path
+    // returns.
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    // Type-only imports must say so (`import type`), so they're always erased.
+    "verbatimModuleSyntax": true
+  },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["**/node_modules", "**/Pods"]
 }

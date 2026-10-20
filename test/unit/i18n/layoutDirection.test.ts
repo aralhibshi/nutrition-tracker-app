@@ -10,10 +10,10 @@ function fakeManager(isRTL: boolean): FakeManager {
     isRTL,
     calls: [],
     allowRTL(allow) {
-      manager.calls.push(`allowRTL(${allow})`);
+      manager.calls.push(`allowRTL(${String(allow)})`);
     },
     forceRTL(force) {
-      manager.calls.push(`forceRTL(${force})`);
+      manager.calls.push(`forceRTL(${String(force)})`);
     },
   };
   return manager;

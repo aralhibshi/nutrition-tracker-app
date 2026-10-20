@@ -21,8 +21,9 @@ import en from './locales/en';
 
 const directionRestartReason: string = 'layout-direction';
 
-const restartForDirection = (): void =>
+const restartForDirection = (): void => {
   RNRestart.restart(directionRestartReason);
+};
 
 // I18nManager.isRTL only changes after a restart, so a direction requested
 // earlier in this session (with its restart still pending) would otherwise
@@ -63,24 +64,21 @@ function currentLanguage(): Language {
 function followLanguageChanges(): void {
   appStateSubscription?.remove();
   appStateSubscription = AppState.addEventListener('change', state => {
-    if (state !== 'active') {
-      return;
+    if (state === 'active') {
+      // i18next resolves changeLanguage even if loading fails, and the
+      // translations are bundled, so there's no rejection to handle.
+      void applyCurrentLanguage();
     }
-    const language: Language = currentLanguage();
-    if (language === i18n.language) {
-      return;
-    }
-    i18n
-      .changeLanguage(language)
-      .then(() =>
-        syncLayoutDirection(
-          language,
-          directionManager,
-          restartForDirection,
-          false,
-        ),
-      );
   });
+}
+
+async function applyCurrentLanguage(): Promise<void> {
+  const language: Language = currentLanguage();
+  if (language === i18n.language) {
+    return;
+  }
+  await i18n.changeLanguage(language);
+  syncLayoutDirection(language, directionManager, restartForDirection, false);
 }
 
 /**
@@ -94,7 +92,9 @@ export function setupI18n(chosenLanguage: Language | null = null): Language {
   chosen = chosenLanguage;
   const language: Language = currentLanguage();
 
-  i18n
+  // With bundled translations and initAsync: false, init finishes
+  // synchronously; its promise has nothing left to report.
+  void i18n
     .use(ICU)
     .use(initReactI18next)
     .init({

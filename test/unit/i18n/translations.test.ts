@@ -9,11 +9,12 @@ import {
 import ar from '../../../src/i18n/locales/ar';
 import en from '../../../src/i18n/locales/en';
 
-function keysOf(value: object, prefix = ''): string[] {
-  return Object.entries(value).flatMap(([key, child]) =>
-    typeof child === 'object' && child !== null
-      ? keysOf(child, `${prefix}${key}.`)
-      : [`${prefix}${key}`],
+function keysOf(value: object, prefix: string = ''): string[] {
+  return Object.entries(value).flatMap(
+    ([key, child]: [string, unknown]): string[] =>
+      typeof child === 'object' && child !== null
+        ? keysOf(child, `${prefix}${key}.`)
+        : [`${prefix}${key}`],
   );
 }
 

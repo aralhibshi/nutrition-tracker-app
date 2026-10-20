@@ -19,7 +19,7 @@ jest.mock('react-native-nitro-modules', () => ({
 }));
 
 jest.mock('react-native-restart', () =>
-  jest.requireActual('./mocks/reactNativeRestart'),
+  jest.requireActual<object>('./mocks/reactNativeRestart'),
 );
 
 // The library's own mock renders children straight away, with fixed insets.

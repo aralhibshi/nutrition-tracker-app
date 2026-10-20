@@ -25,10 +25,10 @@ import { saveLanguageChoice } from '../../storage/preferences';
 // Covers every Arabic plural form: zero, one, two, few, many and other.
 const counts: readonly number[] = [0, 1, 2, 3, 11, 100];
 
-type LanguageOption = {
+interface LanguageOption {
   readonly choice: Language | null;
   readonly label: string;
-};
+}
 
 function LanguageTestScreen(): React.JSX.Element {
   const { t, i18n } = useTranslation();
