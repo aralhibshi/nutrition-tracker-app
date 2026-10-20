@@ -1,0 +1,2 @@
+# The full checks, as CI runs them, before anything reaches GitHub.
+npm run check

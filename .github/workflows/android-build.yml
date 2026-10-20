@@ -1,0 +1,56 @@
+name: Android build
+
+# Started by hand (Actions › Android build › Run workflow). Builds a release
+# APK for testing on a device and attaches it to the run as a download.
+# It's signed with the project's debug keystore, so it installs on any device
+# that allows apps from unknown sources, but can't go to the Play Store.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Git hooks are for local commits; skip installing them in CI.
+  HUSKY: 0
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    name: Release APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - run: npm ci
+
+      # arm64-v8a only: it covers current phones and keeps the build short.
+      - name: Build
+        working-directory: android
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
+
+      - name: Name the APK after this run
+        run: mv android/app/build/outputs/apk/release/app-release.apk "nutrition-tracker-${{ github.run_number }}.apk"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: nutrition-tracker-${{ github.run_number }}.apk
+          # Upload the APK as-is, so it downloads as an .apk rather than a zip.
+          archive: false
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,2 @@
+# Checks the staged files (see lint-staged.config.js).
+npm run check:staged
